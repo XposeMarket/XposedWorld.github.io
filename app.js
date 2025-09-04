@@ -373,10 +373,18 @@ async function renderPost(){
   renderFooter();
   await renderHeader();
 
-  const id = new URLSearchParams(location.search).get("id");
-  const view = $("#postView");
-  try{
-    const post = await dbGetPost(id);
+const rawId = new URLSearchParams(location.search).get("id");
+const id = decodeURIComponent(rawId || "");
+const view = $("#postView");
+
+if (!id) {
+  view.innerHTML = `<div class="card">Article not found (missing id).</div>`;
+  return;
+}
+
+try {
+  const post = await dbGetPost(id);
+
     if(!post){ view.innerHTML = `<div class="card">Article not found.</div>`; return; }
 
     const bodyHTML = (post.content||"").split("\n\n").map(par=>`<p>${par.replace(/\n/g,"<br>")}</p>`).join("");
