@@ -315,25 +315,46 @@ async function renderAdmin(){
   const form = $("#postForm");
   const listEl = $("#postList");
 
-  form.onsubmit = async (e)=>{
-    e.preventDefault();
-    const post = {
-      title: $("#title").value.trim(),
-      image: $("#image").value.trim() || null,
-      topic: $("#topic").value,
-      tags: toTags($("#tags").value),
-      byline: "AutoNews Desk",
-      author_email: email,
-      content: $("#content").value.trim()
-    };
-    if(!post.title || !post.content){ alert("Title and Article are required."); return; }
-    try{
-      await dbInsertPost(post);
-      alert("Post published!");
-      form.reset();
-      await drawList();
-    }catch(err){ alert("Error: " + err.message); }
+form.onsubmit = async (e)=>{
+  e.preventDefault();
+  const title = $("#title").value.trim();
+  const content = $("#content").value.trim();
+  if (!title || !content) { alert("Title and Article are required."); return; }
+
+  const imageUrlInput = ($("#image").value || "").trim();
+  const file = $("#imageFile")?.files?.[0];
+  let finalImageUrl = imageUrlInput || null;
+
+  // If a file is provided, upload it and use its public URL
+  if (file) {
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const safeTitle = title.toLowerCase().replace(/[^a-z0-9]+/g,"-").slice(0,50);
+    const path = `posts/${Date.now()}-${safeTitle}.${ext}`;
+
+    const { error: upErr } = await sb.storage.from("images").upload(path, file, { upsert: true });
+    if (upErr) { alert("Upload failed: " + upErr.message); return; }
+
+    const { data: pub } = sb.storage.from("images").getPublicUrl(path);
+    finalImageUrl = pub.publicUrl;
+  }
+
+  const post = {
+    title,
+    image: finalImageUrl,
+    topic: $("#topic").value,
+    tags: toTags($("#tags").value),
+    byline: "AutoNews Desk",
+    author_email: email,
+    content
   };
+
+  try{
+    await dbInsertPost(post);
+    alert("Post published!");
+    form.reset();
+    await drawList();
+  }catch(err){ alert("Error: " + err.message); }
+};
 
   async function drawList(){
     const posts = await dbLoadPosts({ from:0, to:49 });
