@@ -1,0 +1,37 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AutoNews.AI — Home</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="home">
+  <div id="site-header"></div>
+
+  <main class="wrap" style="padding-block:18px 30px">
+    <div class="grid">
+      <section class="card">
+        <div class="row" style="justify-content:space-between"><h3>Market Snapshot</h3><span class="badge">Rotating</span></div>
+        <div id="prices" class="mut">Loading prices…</div>
+      </section>
+
+      <section class="card">
+        <h3>Topics</h3>
+        <div class="chips" id="topics"></div>
+        <h3 style="margin-top:12px">Tags</h3>
+        <div class="chips" id="tags"></div>
+      </section>
+
+      <section id="feed" class="card" style="grid-column:1 / -1">
+        <h3 style="margin-top:0">Latest</h3>
+        <div id="stories"></div>
+      </section>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="app.js"></script>
+</body>
+</html>
