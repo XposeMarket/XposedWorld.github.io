@@ -26,7 +26,12 @@ async function renderHeader(){
   let role = "guest";
 
   if (email) {
-    const { data: prof } = await sb.from('user_profiles').select('role').eq('email', email).maybeSingle();
+const normalized = (email || '').trim().toLowerCase();
+const { data: prof } = await sb
+  .from('user_profiles')
+  .select('role')
+  .ilike('email', normalized)  // case-insensitive
+  .maybeSingle();
     role = prof?.role || "user";
     setSession({ email, role, ts: Date.now() });
   } else {
@@ -128,7 +133,12 @@ async function dbLoadPosts({ from=0, to=4, topic=null, tag=null }={}){
   return data || [];
 }
 async function dbGetPost(id){
-  const { data, error } = await sb.from('posts').select('*').eq('id', id).maybeSingle();
+const normalized = (email || '').trim().toLowerCase();
+const { data: prof } = await sb
+  .from('user_profiles')
+  .select('role')
+  .ilike('email', normalized)  // case-insensitive
+  .maybeSingle();
   if(error) throw error;
   return data;
 }
@@ -277,7 +287,12 @@ async function renderLogin(){
     try{
       const { error } = await sb.auth.signUp({ email, password: pw });
       if(error) throw error;
-      const { data: prof } = await sb.from('user_profiles').select('role').eq('email', email).maybeSingle();
+const normalized = (email || '').trim().toLowerCase();
+const { data: prof } = await sb
+  .from('user_profiles')
+  .select('role')
+  .ilike('email', normalized)  // case-insensitive
+  .maybeSingle();
       setSession({ email, role: prof?.role || 'user', ts: Date.now() });
       alert("Account created.");
       location.href = "index.html";
