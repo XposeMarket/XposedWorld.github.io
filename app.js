@@ -56,8 +56,8 @@ function renderFooter(){
   el.innerHTML = `
     <footer class="wrap" style="padding:8px 16px 24px">
       <div class="row" style="justify-content:space-between">
-        <div>© ${new Date().getFullYear()} AutoNews.AI</div>
-        <div class="mut">Powered by Supabase • Static front-end</div>
+        <div>© ${new Date().getFullYear()} Xposed.World</div>
+        <div class="mut">Powered by XposeMarket</div>
       </div>
     </footer>
   `;
