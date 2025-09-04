@@ -36,7 +36,7 @@ async function renderHeader(){
   el.innerHTML = `
     <header>
       <div class="wrap row">
-        <div class="brand"><a href="index.html" style="text-decoration:none;color:inherit">AutoNews<span>.AI</span></a></div>
+        <div class="brand"><a href="index.html" style="text-decoration:none;color:inherit">Xposed<span>.World</span></a></div>
         <nav class="nav ml-auto">
           <a href="index.html">Home</a>
           <a href="login.html">${email ? "Account" : "Login"}</a>
