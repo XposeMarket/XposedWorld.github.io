@@ -36,9 +36,9 @@ async function renderHeader(){
   el.innerHTML = `
     <header>
       <div class="wrap row">
-        <div class="brand"><a href="index (18).html" style="text-decoration:none;color:inherit">AutoNews<span>.AI</span></a></div>
+        <div class="brand"><a href="index.html" style="text-decoration:none;color:inherit">AutoNews<span>.AI</span></a></div>
         <nav class="nav ml-auto">
-          <a href="index (18).html">Home</a>
+          <a href="index.html">Home</a>
           <a href="login.html">${email ? "Account" : "Login"}</a>
           ${role === "admin" ? `<a href="admin.html">Admin</a>` : ""}
           ${email ? `<button id="btnLogout" title="Sign out">Logout</button>` : ""}
@@ -47,7 +47,7 @@ async function renderHeader(){
     </header>
   `;
   const btn = document.getElementById("btnLogout");
-  if(btn){ btn.onclick = async ()=>{ await sb.auth.signOut(); localStorage.removeItem('autonews_session'); location.href="index (18).html"; }; }
+  if(btn){ btn.onclick = async ()=>{ await sb.auth.signOut(); localStorage.removeItem('autonews_session'); location.href="index.html"; }; }
 }
 
 function renderFooter(){
@@ -266,7 +266,7 @@ async function renderLogin(){
       const { data: prof } = await sb.from('user_profiles').select('role').eq('email', email).maybeSingle();
       setSession({ email, role: prof?.role || 'user', ts: Date.now() });
       alert("Signed in!");
-      location.href = "index (18).html";
+      location.href = "index.html";
     }catch(err){ alert(err.message); }
   };
 
@@ -280,7 +280,7 @@ async function renderLogin(){
       const { data: prof } = await sb.from('user_profiles').select('role').eq('email', email).maybeSingle();
       setSession({ email, role: prof?.role || 'user', ts: Date.now() });
       alert("Account created.");
-      location.href = "index (18).html";
+      location.href = "index.html";
     }catch(err){ alert(err.message); }
   };
 }
@@ -375,7 +375,7 @@ async function renderPost(){
         <div class="content" style="font-size:18px">${bodyHTML}</div>
         <hr>
         <div class="row" style="justify-content:space-between">
-          <a href="index (18).html">← Back to Home</a>
+          <a href="index.html">← Back to Home</a>
           <button id="copyBtn">Copy share text</button>
         </div>
       </article>
