@@ -95,6 +95,19 @@ async function renderHeader(){
   }
 }
 
+function renderFooter(){
+  const el = document.getElementById("site-footer");
+  if(!el) return;
+  el.innerHTML = `
+    <footer class="wrap" style="padding:8px 16px 24px">
+      <div class="row" style="justify-content:space-between">
+        <div>© ${new Date().getFullYear()} Xposed.World</div>
+        <div class="mut">Powered by XposeMarket</div>
+      </div>
+    </footer>
+  `;
+}
+
 
 // ---------- Markets (SPY, DIA, NVDA, BTC, ETH) rotation ----------
 async function fetchStocks(){
