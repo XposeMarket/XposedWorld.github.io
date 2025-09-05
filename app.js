@@ -21,58 +21,54 @@ async function renderHeader(){
   const el = document.getElementById("site-header");
   if(!el) return;
 
-  // Get session + role
-  const { data: { session } } = await sb.auth.getSession();
-  let email = session?.user?.email || null;
-  let role = "guest";
+  let email = null, role = "guest";
 
-  if (email) {
-    const normalized = (email || '').trim().toLowerCase();
-    const { data: prof } = await sb
-      .from('user_profiles')
-      .select('role')
-      .ilike('email', normalized)
-      .maybeSingle();
-    role = prof?.role || "user";
-    setSession({ email, role, ts: Date.now() });
-  } else {
-    localStorage.removeItem('autonews_session');
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    email = session?.user?.email || null;
+
+    if (email) {
+      const normalized = (email || '').trim().toLowerCase();
+      const { data: prof, error } = await sb
+        .from('user_profiles')
+        .select('role')
+        .ilike('email', normalized)
+        .maybeSingle();
+      if (error) console.warn("role lookup error:", error);
+      role = prof?.role || "user";
+      setSession({ email, role, ts: Date.now() });
+    } else {
+      localStorage.removeItem('autonews_session');
+    }
+  } catch (e) {
+    console.warn("renderHeader error:", e);
+    // fall through with guest header
   }
 
   el.innerHTML = `
     <header>
       <div class="wrap row">
         <div class="brand"><a href="index.html" style="text-decoration:none;color:inherit">Xposed<span>.World</span></a></div>
-
-        <!-- Desktop nav -->
         <nav class="nav ml-auto">
           <a href="index.html">Home</a>
           <a href="login.html">${email ? "Account" : "Login"}</a>
           ${role === "admin" ? `<a href="admin.html">Admin</a>` : ""}
           ${email ? `<button id="btnLogout" title="Sign out">Logout</button>` : ""}
         </nav>
-
-        <!-- Mobile burger -->
-        <button class="burger ml-auto" id="burgerBtn" aria-label="Open menu">☰</button>
-        <div class="mobile-nav" id="mobileNav" role="menu">
-          <a href="index.html">Home</a>
-          <a href="login.html">${email ? "Account" : "Login"}</a>
-          ${role === "admin" ? `<a href="admin.html">Admin</a>` : ""}
-          ${email ? `<button id="mLogout">Logout</button>` : ""}
-        </div>
       </div>
     </header>
   `;
 
-  // Desktop logout
   const btn = document.getElementById("btnLogout");
   if(btn){
     btn.onclick = async ()=>{
-      await sb.auth.signOut();
+      try { await sb.auth.signOut(); } catch(e){ console.warn(e); }
       localStorage.removeItem('autonews_session');
       location.href="index.html";
     };
   }
+}
+
   // Mobile logout
   const mBtn = document.getElementById("mLogout");
   if(mBtn){
@@ -478,10 +474,16 @@ if (!id) {
 // ---------- Boot per page (uses body's data-page, if present) ----------
 document.addEventListener("DOMContentLoaded", async () => {
   const pageAttr = document.body.getAttribute("data-page");
-  await renderHeader();
-  renderFooter();
-  if(pageAttr==="home") await renderHome();
-  if(pageAttr==="login") await renderLogin();
-  if(pageAttr==="admin") await renderAdmin();
-  if(pageAttr==="post") await renderPost();
+
+  try { await renderHeader(); } catch(e){ console.warn("header failed:", e); }
+  try { renderFooter(); } catch(e){ console.warn("footer failed:", e); }
+
+  try {
+    if(pageAttr==="home") await renderHome();
+    if(pageAttr==="login") await renderLogin();
+    if(pageAttr==="admin") await renderAdmin();
+    if(pageAttr==="post") await renderPost();
+  } catch(e) {
+    console.warn("page init failed:", e);
+  }
 });
