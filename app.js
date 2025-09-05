@@ -7,6 +7,7 @@ const sb = (() => {
   }
   return window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON);
 })();
+const BUCKET_NAME = "images"; // set to your exact bucket name
 
 // ---------- Utilities ----------
 const $ = (sel, root=document) => root.querySelector(sel);
@@ -358,45 +359,42 @@ async function renderAdmin(){
   const listEl = $("#postList");
 
 form.onsubmit = async (e)=>{
-  e.preventDefault();
-  const title = $("#title").value.trim();
-  const content = $("#content").value.trim();
-  if (!title || !content) { alert("Title and Article are required."); return; }
+const title = $("#title").value.trim();
+const content = $("#content").value.trim();
+if (!title || !content) { alert("Title and Article are required."); return; }
 
-  const imageUrlInput = ($("#image").value || "").trim();
-  const file = $("#imageFile")?.files?.[0];
-  let finalImageUrl = imageUrlInput || null;
+const imageUrlInput = ($("#image").value || "").trim();
+const file = $("#imageFile")?.files?.[0];
+let finalImageUrl = imageUrlInput || null;
 
-  // If a file is provided, upload it and use its public URL
-  if (file) {
-    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-    const safeTitle = title.toLowerCase().replace(/[^a-z0-9]+/g,"-").slice(0,50);
-    const path = `posts/${Date.now()}-${safeTitle}.${ext}`;
+// If file provided, upload to Storage and use its public URL
+if (file) {
+  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const safeTitle = title.toLowerCase().replace(/[^a-z0-9]+/g,"-").slice(0,50);
+  const path = `posts/${Date.now()}-${safeTitle}.${ext}`;
 
-    const { error: upErr } = await sb.storage.from("images").upload(path, file, { upsert: true });
-    if (upErr) { alert("Upload failed: " + upErr.message); return; }
+  const { error: upErr } = await sb.storage.from(BUCKET_NAME).upload(path, file, { upsert: true });
+  if (upErr) { alert("Upload failed: " + upErr.message); return; }
 
-    const { data: pub } = sb.storage.from("images").getPublicUrl(path);
-    finalImageUrl = pub.publicUrl;
-  }
+  const { data: pub } = sb.storage.from(BUCKET_NAME).getPublicUrl(path);
+  finalImageUrl = pub.publicUrl;
+}
 
-  const post = {
-    title,
-    image: finalImageUrl,
-    topic: $("#topic").value,
-    tags: toTags($("#tags").value),
-    byline: "AutoNews Desk",
-    author_email: email,
-    content
-  };
-
-  try{
-    await dbInsertPost(post);
-    alert("Post published!");
-    form.reset();
-    await drawList();
-  }catch(err){ alert("Error: " + err.message); }
+const post = {
+  title,
+  image: finalImageUrl,
+  topic: $("#topic").value,
+  tags: toTags($("#tags").value),
+  byline: "AutoNews Desk",
+  author_email: email,
+  content
 };
+
+await dbInsertPost(post);
+alert("Post published!");
+form.reset();
+await drawList();
+
 
   async function drawList(){
     const posts = await dbLoadPosts({ from:0, to:49 });
