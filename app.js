@@ -20,13 +20,18 @@ async function renderHeader(){
   const el = document.getElementById("site-header");
   if(!el) return;
 
-  // Check Supabase session & role
+  // Get session + role
   const { data: { session } } = await sb.auth.getSession();
   let email = session?.user?.email || null;
   let role = "guest";
 
   if (email) {
-    const { data: prof } = await sb.from('user_profiles').select('role').eq('email', email).maybeSingle();
+    const normalized = (email || '').trim().toLowerCase();
+    const { data: prof } = await sb
+      .from('user_profiles')
+      .select('role')
+      .ilike('email', normalized)   // case-insensitive match
+      .maybeSingle();
     role = prof?.role || "user";
     setSession({ email, role, ts: Date.now() });
   } else {
@@ -37,31 +42,59 @@ async function renderHeader(){
     <header>
       <div class="wrap row">
         <div class="brand"><a href="index.html" style="text-decoration:none;color:inherit">Xposed<span>.World</span></a></div>
+
+        <!-- Desktop nav -->
         <nav class="nav ml-auto">
           <a href="index.html">Home</a>
           <a href="login.html">${email ? "Account" : "Login"}</a>
           ${role === "admin" ? `<a href="admin.html">Admin</a>` : ""}
           ${email ? `<button id="btnLogout" title="Sign out">Logout</button>` : ""}
         </nav>
+
+        <!-- Mobile burger -->
+        <button class="burger ml-auto" id="burgerBtn" aria-label="Open menu">☰</button>
+        <div class="mobile-nav" id="mobileNav" role="menu">
+          <a href="index.html">Home</a>
+          <a href="login.html">${email ? "Account" : "Login"}</a>
+          ${role === "admin" ? `<a href="admin.html">Admin</a>` : ""}
+          ${email ? `<button id="mLogout">Logout</button>` : ""}
+        </div>
       </div>
     </header>
   `;
+
   const btn = document.getElementById("btnLogout");
-  if(btn){ btn.onclick = async ()=>{ await sb.auth.signOut(); localStorage.removeItem('autonews_session'); location.href="index.html"; }; }
+  if(btn){
+    btn.onclick = async ()=>{
+      await sb.auth.signOut();
+      localStorage.removeItem('autonews_session');
+      location.href="index.html";
+    };
+  }
+  const mBtn = document.getElementById("mLogout");
+  if(mBtn){
+    mBtn.onclick = async ()=>{
+      await sb.auth.signOut();
+      localStorage.removeItem('autonews_session');
+      location.href="index.html";
+    };
+  }
+
+  // Toggle mobile dropdown
+  const burger = document.getElementById("burgerBtn");
+  const mnav = document.getElementById("mobileNav");
+  if(burger && mnav){
+    burger.onclick = () => {
+      const show = mnav.style.display === "block" ? "none" : "block";
+      mnav.style.display = show;
+    };
+    // Click outside to close
+    document.addEventListener("click", (e)=>{
+      if(!mnav.contains(e.target) && e.target !== burger){ mnav.style.display = "none"; }
+    });
+  }
 }
 
-function renderFooter(){
-  const el = document.getElementById("site-footer");
-  if(!el) return;
-  el.innerHTML = `
-    <footer class="wrap" style="padding:8px 16px 24px">
-      <div class="row" style="justify-content:space-between">
-        <div>© ${new Date().getFullYear()} Xposed.World</div>
-        <div class="mut">Powered by XposeMarket</div>
-      </div>
-    </footer>
-  `;
-}
 
 // ---------- Markets (SPY, DIA, NVDA, BTC, ETH) rotation ----------
 async function fetchStocks(){
