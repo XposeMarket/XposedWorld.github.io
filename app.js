@@ -434,14 +434,19 @@ async function renderPost(){
   renderFooter();
   await renderHeader();
 
-  const rawId = new URLSearchParams(location.search).get("id");
-  const id = decodeURIComponent(rawId || "");
-  const view = $("#postView");
+const rawId = new URLSearchParams(location.search).get("id");
+const id = decodeURIComponent(rawId || "");
+const view = $("#postView");
 
-  if (!id) {
-    view.innerHTML = `<div class="card">Article not found (missing id).</div>`;
-    return;
-  }
+if (!id) {
+  view.innerHTML = `<div class="card">Article not found (missing id).</div>`;
+  return;
+}
+} catch (e) {
+  console.warn("Error loading article:", e);
+  view.innerHTML = `<div class="card">Error loading article.</div>`;
+}
+
 
   try{
     const post = await dbGetPost(id);
