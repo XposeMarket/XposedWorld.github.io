@@ -20,80 +20,63 @@ async function renderHeader(){
   const el = document.getElementById("site-header");
   if(!el) return;
 
-  // Get session + role
+  // Check Supabase session & role
   const { data: { session } } = await sb.auth.getSession();
   let email = session?.user?.email || null;
   let role = "guest";
 
   if (email) {
-    const normalized = (email || '').trim().toLowerCase();
-    const { data: prof } = await sb
-      .from('user_profiles')
-      .select('role')
-      .ilike('email', normalized)   // case-insensitive match
-      .maybeSingle();
+    const { data: prof } = await sb.from('user_profiles').select('role').eq('email', email).maybeSingle();
     role = prof?.role || "user";
     setSession({ email, role, ts: Date.now() });
   } else {
     localStorage.removeItem('autonews_session');
   }
+el.innerHTML = `
+  <header>
+    <div class="wrap row">
+      <div class="brand"><a href="index.html" style="text-decoration:none;color:inherit">Xposed<span>.World</span></a></div>
 
-  el.innerHTML = `
-    <header>
-      <div class="wrap row">
-        <div class="brand"><a href="index.html" style="text-decoration:none;color:inherit">Xposed<span>.World</span></a></div>
+      <!-- Desktop nav -->
+      <nav class="nav ml-auto">
+        <a href="index.html">Home</a>
+        <a href="login.html">${email ? "Account" : "Login"}</a>
+        ${role === "admin" ? `<a href="admin.html">Admin</a>` : ""}
+        ${email ? `<button id="btnLogout" title="Sign out">Logout</button>` : ""}
+      </nav>
 
-        <!-- Desktop nav -->
-        <nav class="nav ml-auto">
-          <a href="index.html">Home</a>
-          <a href="login.html">${email ? "Account" : "Login"}</a>
-          ${role === "admin" ? `<a href="admin.html">Admin</a>` : ""}
-          ${email ? `<button id="btnLogout" title="Sign out">Logout</button>` : ""}
-        </nav>
-
-        <!-- Mobile burger -->
-        <button class="burger ml-auto" id="burgerBtn" aria-label="Open menu">☰</button>
-        <div class="mobile-nav" id="mobileNav" role="menu">
-          <a href="index.html">Home</a>
-          <a href="login.html">${email ? "Account" : "Login"}</a>
-          ${role === "admin" ? `<a href="admin.html">Admin</a>` : ""}
-          ${email ? `<button id="mLogout">Logout</button>` : ""}
-        </div>
+      <!-- Mobile burger -->
+      <button class="burger ml-auto" id="burgerBtn">☰</button>
+      <div class="mobile-nav" id="mobileNav">
+        <a href="index.html">Home</a>
+        <a href="login.html">${email ? "Account" : "Login"}</a>
+        ${role === "admin" ? `<a href="admin.html">Admin</a>` : ""}
+        ${email ? `<button id="mLogout">Logout</button>` : ""}
       </div>
-    </header>
-  `;
+    </div>
+  </header>
+`;
 
-  const btn = document.getElementById("btnLogout");
-  if(btn){
-    btn.onclick = async ()=>{
-      await sb.auth.signOut();
-      localStorage.removeItem('autonews_session');
-      location.href="index.html";
-    };
-  }
-  const mBtn = document.getElementById("mLogout");
-  if(mBtn){
-    mBtn.onclick = async ()=>{
-      await sb.auth.signOut();
-      localStorage.removeItem('autonews_session');
-      location.href="index.html";
-    };
-  }
+const btn = document.getElementById("btnLogout");
+if(btn){ btn.onclick = async ()=>{ await sb.auth.signOut(); localStorage.removeItem('autonews_session'); location.href="index.html"; }; }
 
-  // Toggle mobile dropdown
-  const burger = document.getElementById("burgerBtn");
-  const mnav = document.getElementById("mobileNav");
-  if(burger && mnav){
-    burger.onclick = () => {
-      const show = mnav.style.display === "block" ? "none" : "block";
-      mnav.style.display = show;
-    };
-    // Click outside to close
-    document.addEventListener("click", (e)=>{
-      if(!mnav.contains(e.target) && e.target !== burger){ mnav.style.display = "none"; }
-    });
-  }
+const mBtn = document.getElementById("mLogout");
+if(mBtn){ mBtn.onclick = async ()=>{ await sb.auth.signOut(); localStorage.removeItem('autonews_session'); location.href="index.html"; }; }
+
+// Toggle mobile dropdown
+const burger = document.getElementById("burgerBtn");
+const mnav = document.getElementById("mobileNav");
+if(burger && mnav){
+  burger.onclick = () => {
+    const show = mnav.style.display === "block" ? "none" : "block";
+    mnav.style.display = show;
+  };
+  // Hide when clicking elsewhere
+  document.addEventListener("click", (e)=>{
+    if(!mnav.contains(e.target) && e.target !== burger){ mnav.style.display = "none"; }
+  });
 }
+
 
 function renderFooter(){
   const el = document.getElementById("site-footer");
@@ -107,6 +90,7 @@ function renderFooter(){
     </footer>
   `;
 }
+
 
 
 // ---------- Markets (SPY, DIA, NVDA, BTC, ETH) rotation ----------
