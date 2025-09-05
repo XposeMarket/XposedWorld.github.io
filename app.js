@@ -21,19 +21,30 @@ async function renderHeader(){
   const el = document.getElementById("site-header");
   if(!el) return;
 
-  let email = null, role = "guest";
+  // 1) Paint a basic header IMMEDIATELY (guest view)
+  el.innerHTML = `
+    <header>
+      <div class="wrap row">
+        <div class="brand"><a href="index.html" style="text-decoration:none;color:inherit">Xposed<span>.World</span></a></div>
+        <nav class="nav ml-auto">
+          <a href="index.html">Home</a>
+          <a href="login.html">Login</a>
+        </nav>
+      </div>
+    </header>
+  `;
 
+  // 2) Try to fetch session/role and UPGRADE the nav if possible
   try {
-    // Supabase session (may fail if sb isn’t ready yet)
     const { data: { session } } = await sb.auth.getSession();
-    email = session?.user?.email || null;
+    const email = session?.user?.email || null;
 
+    let role = "guest";
     if (email) {
-      const normalized = (email || '').trim().toLowerCase();
       const { data: prof, error } = await sb
         .from('user_profiles')
         .select('role')
-        .ilike('email', normalized)  // case-insensitive
+        .ilike('email', (email || '').trim().toLowerCase())
         .maybeSingle();
       if (error) console.warn("role lookup error:", error);
       role = prof?.role || "user";
@@ -41,10 +52,31 @@ async function renderHeader(){
     } else {
       localStorage.removeItem('autonews_session');
     }
+
+    // Rebuild the nav with account/admin/logout when signed in
+    const navHtml = `
+      <a href="index.html">Home</a>
+      <a href="login.html">${email ? "Account" : "Login"}</a>
+      ${role === "admin" ? `<a href="admin.html">Admin</a>` : ""}
+      ${email ? `<button id="btnLogout" title="Sign out">Logout</button>` : ""}
+    `;
+    const nav = el.querySelector(".nav");
+    if (nav) nav.innerHTML = navHtml;
+
+    const btn = document.getElementById("btnLogout");
+    if(btn){
+      btn.onclick = async ()=>{
+        try { await sb.auth.signOut(); } catch(e){ console.warn(e); }
+        localStorage.removeItem('autonews_session');
+        location.href="index.html";
+      };
+    }
   } catch (e) {
-    console.warn("renderHeader error:", e);
-    // fall through and still render a guest header
+    // If auth/role fails, we keep the guest header already rendered
+    console.warn("renderHeader upgrade error:", e);
   }
+}
+
 
   // Always write the header HTML, even if auth failed
   el.innerHTML = `
