@@ -31,7 +31,7 @@ async function renderHeader(){
     const { data: prof } = await sb
       .from('user_profiles')
       .select('role')
-      .ilike('email', normalized)   // case-insensitive match
+      .ilike('email', normalized)
       .maybeSingle();
     role = prof?.role || "user";
     setSession({ email, role, ts: Date.now() });
@@ -64,6 +64,7 @@ async function renderHeader(){
     </header>
   `;
 
+  // Desktop logout
   const btn = document.getElementById("btnLogout");
   if(btn){
     btn.onclick = async ()=>{
@@ -72,6 +73,7 @@ async function renderHeader(){
       location.href="index.html";
     };
   }
+  // Mobile logout
   const mBtn = document.getElementById("mLogout");
   if(mBtn){
     mBtn.onclick = async ()=>{
@@ -81,15 +83,13 @@ async function renderHeader(){
     };
   }
 
-  // Toggle mobile dropdown
+  // Burger toggle
   const burger = document.getElementById("burgerBtn");
   const mnav = document.getElementById("mobileNav");
   if(burger && mnav){
     burger.onclick = () => {
-      const show = mnav.style.display === "block" ? "none" : "block";
-      mnav.style.display = show;
+      mnav.style.display = mnav.style.display === "block" ? "none" : "block";
     };
-    // Click outside to close
     document.addEventListener("click", (e)=>{
       if(!mnav.contains(e.target) && e.target !== burger){ mnav.style.display = "none"; }
     });
