@@ -24,6 +24,7 @@ async function renderHeader(){
   let email = null, role = "guest";
 
   try {
+    // Supabase session (may fail if sb isn’t ready yet)
     const { data: { session } } = await sb.auth.getSession();
     email = session?.user?.email || null;
 
@@ -32,7 +33,7 @@ async function renderHeader(){
       const { data: prof, error } = await sb
         .from('user_profiles')
         .select('role')
-        .ilike('email', normalized)
+        .ilike('email', normalized)  // case-insensitive
         .maybeSingle();
       if (error) console.warn("role lookup error:", error);
       role = prof?.role || "user";
@@ -42,13 +43,16 @@ async function renderHeader(){
     }
   } catch (e) {
     console.warn("renderHeader error:", e);
-    // fall through with guest header
+    // fall through and still render a guest header
   }
 
+  // Always write the header HTML, even if auth failed
   el.innerHTML = `
     <header>
       <div class="wrap row">
-        <div class="brand"><a href="index.html" style="text-decoration:none;color:inherit">Xposed<span>.World</span></a></div>
+        <div class="brand">
+          <a href="index.html" style="text-decoration:none;color:inherit">Xposed<span>.World</span></a>
+        </div>
         <nav class="nav ml-auto">
           <a href="index.html">Home</a>
           <a href="login.html">${email ? "Account" : "Login"}</a>
