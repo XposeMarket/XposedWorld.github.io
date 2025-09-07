@@ -432,7 +432,6 @@ async function renderAdmin(){
 
   const form = $("#postForm");
   const listEl = $("#postList");
-// Init Quill
 const quill = new Quill('#quill-editor', {
   theme: 'snow',
   modules: {
@@ -440,6 +439,7 @@ const quill = new Quill('#quill-editor', {
       ['bold','italic','underline'],
       [{ header: [1, 2, false] }],
       [{ list: 'ordered' }, { list: 'bullet' }],
+      ['link'],
       ['clean']
     ]
   }
