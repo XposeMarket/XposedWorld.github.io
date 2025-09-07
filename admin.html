@@ -6,6 +6,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Xposed.World — Admin</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css">
+<script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
+
+<style id="admin-svg-off">
+/* Hide any site-wide SVG helpers/overlays *only* on Admin */
+body.admin-page .pwa-svg-helpers,
+body.admin-page .bg-svg,
+body.admin-page svg[aria-hidden="true"],
+body.admin-page [data-global-overlay],
+body.admin-page [data-pwa-art],
+body.admin-page [data-homescreen-art] {
+  display: none !important;
+}
+
+/* If a global rule injected visible <svg>, hide them too on Admin */
+body.admin-page svg {
+  /* Don’t hide Quill’s icons: they’re CSS background images, not <svg> tags */
+  display: none !important;
+}
+
+/* Nuke any global background-image (including SVG data-URIs) */
+body.admin-page,
+body.admin-page .page-bg,
+body.admin-page .wrap {
+  background-image: none !important;
+}
+
+/* Keep toolbar icons readable even if a global fill leaks in */
+body.admin-page .ql-toolbar svg,
+body.admin-page .ql-toolbar svg * {
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+/* Ensure editor is visible and above any stray layers */
+body.admin-page #editor {
+  min-height: 320px;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  position: relative;
+  z-index: 2;
+}
+body.admin-page #editor-toolbar { position: relative; z-index: 3; }
+</style>
 
 
   <!-- Supabase client -->
@@ -75,6 +120,48 @@
   <script src="app.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
 
+<script>
+(function(){
+  if (!document.body.classList.contains('admin-page')) return;
+
+  // Aggressively remove anything that might have been injected globally
+  const killers = [
+    '.pwa-svg-helpers',
+    '.bg-svg',
+    'svg[aria-hidden="true"]',
+    '[data-global-overlay]',
+    '[data-pwa-art]',
+    '[data-homescreen-art]'
+  ];
+  killers.forEach(sel => document.querySelectorAll(sel).forEach(n => n.remove()));
+
+  // If any full-viewport <svg> slipped through, remove it
+  document.querySelectorAll('svg').forEach(svg => {
+    const r = svg.getBoundingClientRect();
+    if (r.width > innerWidth * 0.7 && r.height > innerHeight * 0.7) svg.remove();
+  });
+})();
+</script>
+<script>
+(function () {
+  if (!document.body.classList.contains('admin-page')) return;
+  if (window.__quillInstance) return;
+
+  const toolbar = document.getElementById('editor-toolbar');
+  const editor  = document.getElementById('editor');
+
+  if (!window.Quill || !toolbar || !editor) {
+    console.warn('Quill init skipped: missing assets or nodes.');
+    return;
+  }
+
+  window.__quillInstance = new Quill('#editor', {
+    theme: 'snow',
+    modules: { toolbar: '#editor-toolbar' },
+    placeholder: 'Write your article here...'
+  });
+})();
+</script>
 
 
 </body>
