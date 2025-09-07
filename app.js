@@ -444,6 +444,10 @@ const quill = new Quill('#quill-editor', {
     ]
   }
 });
+const oldToolbars = document.querySelectorAll('.ql-toolbar');
+oldToolbars.forEach((tb, i) => {
+  if (i > 0) tb.remove(); // keep only the first toolbar
+});
 
 
 // Keep hidden input synced so your existing save flow works
