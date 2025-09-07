@@ -440,7 +440,6 @@ const quill = new Quill('#quill-editor', {
       ['bold','italic','underline'],
       [{ header: [1, 2, false] }],
       [{ list: 'ordered' }, { list: 'bullet' }],
-      ['link'],      // ← this adds the link button
       ['clean']
     ]
   }
