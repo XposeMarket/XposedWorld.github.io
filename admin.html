@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Xposed.World — Admin</title>
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Supabase client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    /* Paste your Supabase values before running */
+    window.SUPABASE_URL = "https://nekhgihyjmgzkjjdlapp.supabase.co";
+    window.SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5la2hnaWh5am1nemtqamRsYXBwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwMjM2ODQsImV4cCI6MjA3MjU5OTY4NH0.8mWrXQTXRQK9Wt1_vPyNcmTsQ9HOzNDHfceLp3BD-ao";
+  </script>
+</head>
+<body data-page="admin">
+  <div id="site-header"></div>
+
+  <main class="wrap" style="padding-block:18px 30px">
+
+    <!-- ================= AI Draft Generator (WebLLM) ================= -->
+    <section class="card" id="gen-draft">
+      <h2>AI Draft Generator (Free • In-Browser)</h2>
+
+      <div class="mut" style="margin:6px 0 10px">
+        Runs locally via WebGPU. First load downloads the model and can take a minute. Keep tab open; it’s cached for next time.
+      </div>
+
+      <form id="draftForm" style="display:grid;grid-template-columns:1fr;gap:10px;max-width:980px">
+        <div class="row" style="gap:10px">
+          <label style="flex:2">Topic
+            <input type="text" name="topic" required placeholder="e.g., ‘Stablecoins under U.S. scrutiny’">
+          </label>
+          <label style="flex:1">Tone
+            <input type="text" name="tone" placeholder="confident, clear">
+          </label>
+          <label style="flex:1">Audience
+            <input type="text" name="audience" placeholder="general">
+          </label>
+        </div>
+
+        <label>Optional Sources (one URL per line, paste only material you want quoted/cited)</label>
+        <textarea name="sources" rows="4" placeholder="https://example.com/article-1
+https://example.com/report-2"></textarea>
+
+        <div class="row" style="gap:10px;align-items:center">
+          <button type="button" id="btnLoadModel">Load Model</button>
+          <button type="submit" id="btnGenerate" class="primary">Generate Draft</button>
+          <span id="webllmStatus" class="mut" style="margin-left:6px"></span>
+          <span id="draftNotice" class="mut ml-auto"></span>
+        </div>
+      </form>
+    </section>
+
+    <!-- ================= Drafts List ================= -->
+    <section class="card" id="drafts" style="margin-top:18px">
+      <h2>Drafts</h2>
+      <div id="draftList" class="list"></div>
+    </section>
+
+    <!-- ================= Manual Post (Original) ================= -->
+    <section class="card" style="margin-top:18px">
+      <h2>New Article</h2>
+      <form id="postForm" style="display:grid;grid-template-columns:1fr;gap:10px;max-width:820px">
+        <label>Title</label>
+        <input id="title" required placeholder="Headline" />
+
+        <label>Lead Image</label>
+        <div class="row" style="gap:10px">
+          <input id="image" placeholder="https://… (optional if you upload a file)" style="flex:2" />
+          <input id="imageFile" type="file" accept="image/*" style="flex:1" />
+        </div>
+        <p class="mut">Paste an image URL or upload a file — if both are provided, the upload wins.</p>
+
+        <div class="row" style="gap:10px">
+          <div style="flex:1">
+            <label>Topic</label>
+            <select id="topic">
+              <option>Crypto</option>
+              <option>US Politics</option>
+              <option>World</option>
+              <option>Regulation</option>
+              <option>Opinion</option>
+            </select>
+          </div>
+          <div style="flex:2">
+            <label>Tags (space or comma separated, include # if you like)</label>
+            <input id="tags" placeholder="#bitcoin #eth policy" />
+          </div>
+        </div>
+
+        <label>Article</label>
+        <textarea id="content" rows="10" placeholder="Write your article here…"></textarea>
+
+        <div class="row" style="margin-top:8px">
+          <button class="primary" type="submit">Publish</button>
+          <a href="index.html" class="ml-auto">Back to Home</a>
+        </div>
+      </form>
+    </section>
+
+    <!-- ================= All Posts (Original) ================= -->
+    <section class="card" style="margin-top:18px">
+      <h2>All Posts</h2>
+      <table class="table" id="postList"></table>
+    </section>
+  </main>
+
+  <!-- ================= Edit Modal ================= -->
+  <div id="editModal" class="modal hidden" aria-hidden="true">
+    <div class="modal__dialog">
+      <header class="modal__header">
+        <h3 id="editTitle">Edit Draft</h3>
+        <button id="editClose" class="icon-btn" aria-label="Close">✖</button>
+      </header>
+
+      <div class="modal__body">
+        <div class="editor">
+          <textarea id="editMd" spellcheck="false"></textarea>
+        </div>
+        <div class="preview" id="editPreview"></div>
+      </div>
+
+      <footer class="modal__footer">
+        <button id="saveEdits">💾 Save</button>
+        <button id="publishEdits" class="primary">✅ Publish</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <!-- Your app logic -->
+  <script src="app.js"></script>
+</body>
+</html>
