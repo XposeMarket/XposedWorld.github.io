@@ -121,3 +121,19 @@ input::placeholder,
 textarea::placeholder {
   color: rgba(233, 238, 247, 0.8);
 }
+
+/* Quill: make editor scroll instead of growing forever */
+#quill-editor .ql-container {
+  height: 320px;           /* desktop height */
+  border-radius: 12px;
+}
+#quill-editor .ql-editor {
+  overflow-y: auto;        /* scroll inside the box */
+  white-space: pre-wrap;   /* keep pasted line breaks */
+  word-break: break-word;  /* long URLs won’t overflow */
+}
+
+/* Smaller box on phones */
+@media (max-width: 720px){
+  #quill-editor .ql-container { height: 220px; }
+}
