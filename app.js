@@ -642,7 +642,7 @@ async function renderAccount(){
     return `
       <article class="row" style="gap:12px;align-items:center;margin:8px 0;padding:10px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.03)">
         <div class="imgwrap" style="height:68px;width:120px;border-radius:10px;overflow:hidden">
-          <img src="${p.image || 'https://picsum.photos/1200/630?blur=2'}" alt="cover">
+          <img src="${asImageUrl(p.image)}" alt="cover">
         </div>
         <div style="flex:1;min-width:0">
           <div class="row" style="gap:8px">
