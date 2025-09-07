@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Xposed.World — Account</title>
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Supabase client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    window.SUPABASE_URL  = "https://nekhgihyjmgzkjjdlapp.supabase.co";
+    window.SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5la2hnaWh5am1nemtqamRsYXBwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwMjM2ODQsImV4cCI6MjA3MjU5OTY4NH0.8mWrXQTXRQK9Wt1_vPyNcmTsQ9HOzNDHfceLp3BD-ao";
+  </script>
+</head>
+<body data-page="account">
+  <div id="site-header"></div>
+
+  <main class="wrap" style="padding-block:18px 30px">
+    <section class="card" style="margin-bottom:18px">
+      <h2>Your Account</h2>
+      <div id="acctMeta" class="mut" style="margin-top:6px">Loading…</div>
+    </section>
+
+    <section class="card">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <h2>Favorites</h2>
+        <div class="mut" id="favCount"></div>
+      </div>
+      <div id="favList" style="margin-top:12px"></div>
+      <div id="favMore" style="margin-top:12px"></div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="app.js"></script>
+</body>
+</html>
