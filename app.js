@@ -432,6 +432,30 @@ async function renderAdmin(){
 
   const form = $("#postForm");
   const listEl = $("#postList");
+// Init Quill
+const quill = new Quill('#quill-editor', {
+  theme: 'snow',
+  modules: {
+    toolbar: [
+      ['bold','italic','underline'],
+      [{ header: [1, 2, false] }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      ['link'],
+      ['clean']
+    ]
+  }
+});
+
+// Keep hidden input synced so your existing save flow works
+const hiddenContent = document.getElementById('content');
+quill.on('text-change', () => {
+  hiddenContent.value = quill.root.innerHTML.trim();
+});
+
+// Optional: preload if the hidden has something (editing flow)
+if (hiddenContent.value) {
+  quill.root.innerHTML = hiddenContent.value;
+}
 
  form.onsubmit = async (e)=>{
   e.preventDefault();
@@ -536,29 +560,32 @@ async function renderPost(){
       return { postCount: m[post.id] || 0 };
     })();
 
-    const bodyHTML = (post.content||"").split("\n\n").map(par=>`<p>${par.replace(/\n/g,"<br>")}</p>`).join("");
-    view.innerHTML = `
-      <article class="card">
-        <div class="imgwrap" style="height:300px;margin-bottom:12px"><img src="${asImageUrl(post.image)}" alt="cover"></div>
-        <div class="row" style="justify-content:space-between;align-items:center">
-          <div>
-            <h1 style="font-size:32px;margin:6px 0">${post.title}</h1>
-            <div class="mut" style="font-size:14px">${new Date(post.ts).toLocaleString()} • ${post.byline||"AutoNews Desk"}</div>
-            <div class="chips" style="margin:8px 0">${(post.tags||[]).map(t=>`<span class="badge">#${t}</span>`).join("")}</div>
-          </div>
-          <button class="heart-btn ${liked?'liked':''}" data-like="${post.id}">
-            <span class="heart">♥</span> <span class="cnt">${postCount}</span>
-          </button>
-        </div>
-        <hr>
-        <div class="content" style="font-size:18px">${bodyHTML}</div>
-        <hr>
-        <div class="row" style="justify-content:space-between">
-          <a href="index.html">← Back to Home</a>
-          <button id="copyBtn">Copy share text</button>
-        </div>
-      </article>
-    `;
+// Quill already saved HTML, so render it directly
+const bodyHTML = post.content || "";
+
+view.innerHTML = `
+  <article class="card">
+    <div class="imgwrap" style="height:300px;margin-bottom:12px"><img src="${asImageUrl(post.image)}" alt="cover"></div>
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <div>
+        <h1 style="font-size:32px;margin:6px 0">${post.title}</h1>
+        <div class="mut" style="font-size:14px">${new Date(post.ts).toLocaleString()} • ${post.byline||"AutoNews Desk"}</div>
+        <div class="chips" style="margin:8px 0">${(post.tags||[]).map(t=>`<span class="badge">#${t}</span>`).join("")}</div>
+      </div>
+      <button class="heart-btn ${liked?'liked':''}" data-like="${post.id}">
+        <span class="heart">♥</span> <span class="cnt">${postCount}</span>
+      </button>
+    </div>
+    <hr>
+    <div class="content" style="font-size:18px">${bodyHTML}</div>
+    <hr>
+    <div class="row" style="justify-content:space-between">
+      <a href="index.html">← Back to Home</a>
+      <button id="copyBtn">Copy share text</button>
+    </div>
+  </article>
+`;
+
     $("#copyBtn").onclick = ()=>{ navigator.clipboard.writeText(`${post.title} — ${location.href}`); };
 
     // Wire heart
