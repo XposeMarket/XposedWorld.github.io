@@ -34,6 +34,32 @@ footer{opacity:.85;font-size:14px}
 .table tr td,.table tr th{padding:8px 10px}
 hr{border:none;border-top:1px solid var(--border);margin:12px 0}
 
+/* --- SVG GLOBAL SAFETY RESET --- */
+svg, svg * {
+  fill: unset !important;
+  stroke: unset !important;
+}
+/* Only your brand/homescreen icons should be affected */
+.brand-icon svg,
+.homescreen-icon svg {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;   /* safe */
+  stroke: none;
+}
+/* Admin hardening */
+.admin-page .ql-toolbar svg,
+.admin-page .ql-toolbar svg * {
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+/* Don’t render helper SVGs on Admin */
+.admin-page svg[aria-hidden="true"],
+.admin-page .pwa-svg-helpers {
+  display: none !important;
+}
+
 /* Mobile nav */
 .burger{display:none;border:1px solid var(--border);background:rgba(50,50,50,.2);color:var(--txt);padding:10px 12px;border-radius:14px}
 .mobile-nav{display:none;position:absolute;right:16px;top:56px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:8px;min-width:160px;z-index:20}
