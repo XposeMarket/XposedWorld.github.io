@@ -122,18 +122,36 @@ textarea::placeholder {
   color: rgba(233, 238, 247, 0.8);
 }
 
-/* Quill: make editor scroll instead of growing forever */
-#quill-editor .ql-container {
-  height: 320px;           /* desktop height */
+/* --- Quill fixed-height, scrollable editor (handles both DOM shapes) --- */
+
+/* If #quill-editor is the container itself */
+#quill-editor.ql-container {
+  height: 320px !important;         /* desktop height */
   border-radius: 12px;
-}
-#quill-editor .ql-editor {
-  overflow-y: auto;        /* scroll inside the box */
-  white-space: pre-wrap;   /* keep pasted line breaks */
-  word-break: break-word;  /* long URLs won’t overflow */
+  overflow: hidden;                  /* hide container overflow; inner editor will scroll */
 }
 
-/* Smaller box on phones */
-@media (max-width: 720px){
-  #quill-editor .ql-container { height: 220px; }
+/* If Quill created a nested .ql-container under #quill-editor */
+#quill-editor .ql-container {
+  height: 320px !important;
+  border-radius: 12px;
+  overflow: hidden;
 }
+
+/* The scrolling region */
+#quill-editor .ql-editor {
+  height: 100% !important;           /* fill the container’s fixed height */
+  overflow-y: auto !important;       /* scroll INSIDE the box */
+  white-space: pre-wrap;
+  word-break: break-word;
+  -webkit-overflow-scrolling: touch; /* smooth iOS scroll */
+}
+
+/* Smaller on phones */
+@media (max-width: 720px) {
+  #quill-editor.ql-container,
+  #quill-editor .ql-container {
+    height: 220px !important;
+  }
+}
+
