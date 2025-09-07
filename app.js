@@ -440,11 +440,12 @@ const quill = new Quill('#quill-editor', {
       ['bold','italic','underline'],
       [{ header: [1, 2, false] }],
       [{ list: 'ordered' }, { list: 'bullet' }],
-      ['link'],
+      ['link'],      // ← this adds the link button
       ['clean']
     ]
   }
 });
+
 
 // Keep hidden input synced so your existing save flow works
 const hiddenContent = document.getElementById('content');
