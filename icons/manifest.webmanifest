@@ -1,7 +1,7 @@
 {
   "name": "Xposed.World",
   "short_name": "Xposed",
-  "start_url": "./index.html",
+  "start_url": "./XposedWorld.github.io/index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#0a0b10",
