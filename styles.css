@@ -155,3 +155,9 @@ textarea::placeholder {
   }
 }
 
+const el = document.querySelector('#quill-editor .ql-editor') 
+       || document.querySelector('#quill-editor.ql-container .ql-editor');
+if (el) {
+  el.style.height = '320px';
+  el.style.overflowY = 'auto';
+}
