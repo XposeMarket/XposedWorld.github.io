@@ -470,7 +470,7 @@ console.log('public url:', imageUrl);
     tags: toTags(document.getElementById("tags").value),
     byline: "AutoNews Desk",
     author_email: (await sb.auth.getSession()).data.session.user.email,
-    content: document.getElementById("content").value.trim(),
+content: quill.root.innerHTML.trim(),
   };
 
   if (!post.title || !post.content) { alert("Title and Article are required."); return; }
