@@ -34,48 +34,6 @@ footer{opacity:.85;font-size:14px}
 .table tr td,.table tr th{padding:8px 10px}
 hr{border:none;border-top:1px solid var(--border);margin:12px 0}
 
-/* --- Neutralize accidental global SVG paints --- */
-svg, svg * {
-  fill: unset !important;
-  stroke: unset !important;
-}
-
-/* --- Admin hardening: keep toolbars/icons normal and hide helpers --- */
-.admin-page .ql-toolbar svg,
-.admin-page .ql-toolbar svg * {
-  fill: currentColor !important;
-  stroke: currentColor !important;
-}
-
-/* Hide any site-wide helper/background SVGs or icon previews on Admin */
-.admin-page .pwa-svg-helpers,
-.admin-page svg[aria-hidden="true"],
-.admin-page .bg-svg {
-  display: none !important;
-}
-
-/* Ensure the editor area is actually visible and above any backgrounds */
-.admin-page .admin-editor {
-  min-height: 320px;
-  background: rgba(255,255,255,0.9);  /* or your panel bg */
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 8px;
-  z-index: 2;
-  position: relative;
-}
-
-/* Keep the toolbar clickable and above overlays */
-.admin-page #editor-toolbar {
-  position: relative;
-  z-index: 3;
-}
-
-/* If any overlay is fixed on all pages, bury it under Admin UI */
-.admin-page [data-global-overlay],
-.admin-page .global-overlay {
-  pointer-events: none !important;
-  z-index: 0 !important;
-}
 
 
 /* Mobile nav */
