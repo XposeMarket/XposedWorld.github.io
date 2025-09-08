@@ -80,13 +80,5 @@
 <div id="quill-editor"></div>
 <input type="hidden" id="post-body" name="body">
 
-<script>
-  const quill = new Quill('#quill-editor', {
-    theme: 'snow',
-    modules: { toolbar: [['bold','italic','underline'], [{ 'header':[1,2,false]}], [{ 'list':'ordered' }, { 'list':'bullet' }], ['link'], ['clean']] }
-  });
-  const hidden = document.getElementById('post-body');
-  quill.on('text-change', ()=> { hidden.value = quill.root.innerHTML.trim(); });
-</script>
 </body>
 </html>
