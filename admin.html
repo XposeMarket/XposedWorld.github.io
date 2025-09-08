@@ -53,7 +53,7 @@ body.admin-page #editor         { position: relative; z-index: 2; min-height: 32
   </script>
 
 </head>
-<body data-page="admin">
+<body class="admin-page" data-page="admin">
   <div id="site-header"></div>
 
   <main class="wrap" style="padding-block:18px 30px">
@@ -138,17 +138,14 @@ body.admin-page #editor         { position: relative; z-index: 2; min-height: 32
   if (!document.body.classList.contains('admin-page')) return;
   if (window.__quillInstance) return;
 
-  const toolbar = document.getElementById('editor-toolbar');
-  const editor  = document.getElementById('editor');
+  const toolbar = document.getElementById('quill-toolbar');
+  const editor  = document.getElementById('quill-editor');
 
-  if (!window.Quill || !toolbar || !editor) {
-    console.warn('Quill init skipped: missing assets or nodes.');
-    return;
-  }
+  if (!window.Quill || !toolbar || !editor) return;
 
-  window.__quillInstance = new Quill('#editor', {
+  window.__quillInstance = new Quill('#quill-editor', {
     theme: 'snow',
-    modules: { toolbar: '#editor-toolbar' },
+    modules: { toolbar: '#quill-toolbar' },
     placeholder: 'Write your article here...'
   });
 })();
