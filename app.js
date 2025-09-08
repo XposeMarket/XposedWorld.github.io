@@ -255,7 +255,7 @@ async function renderHome(){
   const tagsEl = document.getElementById("tags");
   const storiesEl = document.getElementById("stories");
 
-  const topics = ["All","Crypto","US Politics","World","Regulation","Opinion"];
+  const topics = ["All","Crypto/Stocks","US Politics","World","Regulation","Opinion"];
   let topicFilter = "All";
   let tagFilter = null;
   let pageSize = 5;
